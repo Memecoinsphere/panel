@@ -1,176 +1,152 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="fr">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no">
-  <meta name="theme-color" content="#000000">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="Panneau">
-  <meta name="description" content="Hidden Control Panel — local flags only">
-  <link rel="manifest" href="./manifest.webmanifest">
-  <link rel="apple-touch-icon" href="./apple-touch-icon.png">
-  <link rel="icon" type="image/png" sizes="64x64" href="./icon-64.png">
-  <link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
-  <title>Panneau</title>
-  <link rel="stylesheet" href="./styles.css">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#000000">
+<meta name="color-scheme" content="dark">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Panneau">
+<meta name="referrer" content="no-referrer">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'self'; script-src 'self'; connect-src 'none'; manifest-src 'self'; worker-src 'self'">
+<title>Panneau</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="64x64" href="icons/icon-64.png">
+<link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
+<link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <!-- LOCK SCREEN -->
-  <div id="lock-screen" class="screen" aria-live="polite">
-    <div class="lock-inner">
-      <div class="lock-glyph" aria-hidden="true">
-        <!-- lock.shield-style SVG -->
-        <svg viewBox="0 0 64 64" width="72" height="72" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M32 6L52 14v16.5c0 14.2-8.6 24.8-20 28.5C20.6 55.3 12 44.7 12 30.5V14L32 6z"
-                stroke="#8E8E93" stroke-width="3.2" stroke-linejoin="round" fill="none"/>
-          <rect x="25" y="30" width="14" height="11" rx="2.5" fill="#8E8E93"/>
-          <path d="M28 30v-5a4 4 0 018 0v5" stroke="#8E8E93" stroke-width="3" stroke-linecap="round" fill="none"/>
-        </svg>
-      </div>
-      <h1 class="lock-title">Hidden Control Panel</h1>
-      <p class="lock-hint">Enter passcode</p>
-      <div class="passcode-wrap">
-        <input
-          id="passcode"
-          type="password"
-          inputmode="numeric"
-          pattern="[0-9]*"
-          autocomplete="one-time-code"
-          maxlength="8"
-          enterkeyhint="done"
-          aria-label="Passcode"
-          class="passcode-input"
-        >
-      </div>
-      <p id="passcode-error" class="passcode-error" hidden>Incorrect passcode</p>
+<!-- Decoy surface: default on load. Passcode revealed by double-tap in top ~15% strip. -->
+<section id="decoy" class="screen" aria-hidden="false">
+  <div class="decoy-clock">
+    <div id="decoyTime" class="decoy-time">--:--</div>
+    <div id="decoyDate" class="decoy-date"></div>
+  </div>
+</section>
+
+<!-- Passcode screen (hidden until gesture) -->
+<section id="lock" class="screen" hidden>
+  <div class="lock-inner">
+    <svg class="lock-glyph" viewBox="0 0 24 24" aria-hidden="true">
+      <path fill="currentColor" d="M12 2a5 5 0 0 0-5 5v3H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8a2 2 0 0 0-2-2h-1V7a5 5 0 0 0-5-5zm-3 5a3 3 0 1 1 6 0v3H9V7zm3 7a1.5 1.5 0 0 1 .75 2.79V19h-1.5v-2.21A1.5 1.5 0 0 1 12 12z"/>
+    </svg>
+    <h1 class="lock-title">Hidden Control Panel</h1>
+    <p class="lock-sub">Enter passcode</p>
+    <div id="dots" class="dots" aria-live="polite">
+      <span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span>
     </div>
-    <footer class="lock-footer">iOS non-jailbroken · local flags only</footer>
+    <p id="lockError" class="lock-error" hidden>Incorrect passcode</p>
+    <div class="keypad" id="keypad">
+      <button type="button" data-k="1">1</button>
+      <button type="button" data-k="2">2</button>
+      <button type="button" data-k="3">3</button>
+      <button type="button" data-k="4">4</button>
+      <button type="button" data-k="5">5</button>
+      <button type="button" data-k="6">6</button>
+      <button type="button" data-k="7">7</button>
+      <button type="button" data-k="8">8</button>
+      <button type="button" data-k="9">9</button>
+      <button type="button" class="ghost" tabindex="-1" aria-hidden="true"></button>
+      <button type="button" data-k="0">0</button>
+      <button type="button" data-k="del" class="del" aria-label="Delete">⌫</button>
+    </div>
   </div>
+</section>
 
-  <!-- PANEL -->
-  <div id="panel-screen" class="screen" hidden>
-    <header class="panel-header">
-      <h1 class="panel-title">Control Panel</h1>
-      <span class="graphene-badge">GRAPHENE-STYLE</span>
-    </header>
+<!-- Settings panel -->
+<section id="panel" class="screen" hidden>
+  <header class="panel-header">
+    <h1>Control Panel</h1>
+    <span class="badge">GRAPHENE-STYLE</span>
+  </header>
+  <main class="panel-body">
+    <section class="group">
+      <h2 class="group-title">System</h2>
+      <div class="card">
+        <label class="row">
+          <div class="row-text">
+            <span class="row-title">USB-C restricted</span>
+            <span class="row-sub">Block data while locked</span>
+          </div>
+          <input type="checkbox" id="usbCRestricted" class="toggle">
+        </label>
+        <label class="row">
+          <div class="row-text">
+            <span class="row-title">Native debugging</span>
+            <span class="row-sub">ptrace for user apps</span>
+          </div>
+          <input type="checkbox" id="nativeDebugging" class="toggle">
+        </label>
+        <label class="row">
+          <div class="row-text">
+            <span class="row-title">Sensors permission</span>
+            <span class="row-sub">Zero data when denied</span>
+          </div>
+          <input type="checkbox" id="sensorsPermission" class="toggle">
+        </label>
+      </div>
+    </section>
 
-    <main class="panel-main">
-      <!-- System -->
-      <section class="group" aria-labelledby="sec-system">
-        <h2 id="sec-system" class="group-label">System</h2>
-        <ul class="group-list">
-          <li class="row">
-            <div class="row-text">
-              <span class="row-title">USB-C restricted</span>
-              <span class="row-sub">Block data while locked</span>
-            </div>
-            <label class="toggle">
-              <input type="checkbox" data-key="usbCRestricted" checked>
-              <span class="toggle-ui"></span>
-            </label>
-          </li>
-          <li class="row">
-            <div class="row-text">
-              <span class="row-title">Native debugging</span>
-              <span class="row-sub">ptrace for user apps</span>
-            </div>
-            <label class="toggle">
-              <input type="checkbox" data-key="nativeDebugging">
-              <span class="toggle-ui"></span>
-            </label>
-          </li>
-          <li class="row">
-            <div class="row-text">
-              <span class="row-title">Sensors permission</span>
-              <span class="row-sub">Zero data when denied</span>
-            </div>
-            <label class="toggle">
-              <input type="checkbox" data-key="sensorsPermission" checked>
-              <span class="toggle-ui"></span>
-            </label>
-          </li>
-        </ul>
-      </section>
+    <section class="group">
+      <h2 class="group-title">Privacy</h2>
+      <div class="card">
+        <label class="row">
+          <div class="row-text">
+            <span class="row-title">Hide sensitive notifications</span>
+            <span class="row-sub">Lock screen</span>
+          </div>
+          <input type="checkbox" id="hideSensitiveNotifications" class="toggle">
+        </label>
+        <label class="row">
+          <div class="row-text">
+            <span class="row-title">Randomize MAC on reconnect</span>
+            <span class="row-sub">Wi-Fi</span>
+          </div>
+          <input type="checkbox" id="randomizeMac" class="toggle">
+        </label>
+        <label class="row">
+          <div class="row-text">
+            <span class="row-title">Clipboard auto-clear</span>
+            <span class="row-sub">After 60 s</span>
+          </div>
+          <input type="checkbox" id="clipboardAutoClear" class="toggle">
+        </label>
+      </div>
+    </section>
 
-      <!-- Privacy -->
-      <section class="group" aria-labelledby="sec-privacy">
-        <h2 id="sec-privacy" class="group-label">Privacy</h2>
-        <ul class="group-list">
-          <li class="row">
-            <div class="row-text">
-              <span class="row-title">Hide sensitive notifications</span>
-              <span class="row-sub">Lock screen</span>
-            </div>
-            <label class="toggle">
-              <input type="checkbox" data-key="hideSensitiveNotifs" checked>
-              <span class="toggle-ui"></span>
-            </label>
-          </li>
-          <li class="row">
-            <div class="row-text">
-              <span class="row-title">Randomize MAC on reconnect</span>
-              <span class="row-sub">Wi-Fi</span>
-            </div>
-            <label class="toggle">
-              <input type="checkbox" data-key="randomizeMac" checked>
-              <span class="toggle-ui"></span>
-            </label>
-          </li>
-          <li class="row">
-            <div class="row-text">
-              <span class="row-title">Clipboard auto-clear</span>
-              <span class="row-sub">After 60 s</span>
-            </div>
-            <label class="toggle">
-              <input type="checkbox" data-key="clipboardAutoClear" checked>
-              <span class="toggle-ui"></span>
-            </label>
-          </li>
-        </ul>
-      </section>
+    <section class="group">
+      <h2 class="group-title">Debug</h2>
+      <div class="card">
+        <label class="row">
+          <div class="row-text">
+            <span class="row-title">Show layout bounds</span>
+            <span class="row-sub"></span>
+          </div>
+          <input type="checkbox" id="showLayoutBounds" class="toggle">
+        </label>
+        <label class="row">
+          <div class="row-text">
+            <span class="row-title">Force dark mode</span>
+            <span class="row-sub">Override system</span>
+          </div>
+          <input type="checkbox" id="forceDarkMode" class="toggle">
+        </label>
+        <label class="row">
+          <div class="row-text">
+            <span class="row-title">Verbose logging</span>
+            <span class="row-sub">Local only</span>
+          </div>
+          <input type="checkbox" id="verboseLogging" class="toggle">
+        </label>
+      </div>
+    </section>
 
-      <!-- Debug -->
-      <section class="group" aria-labelledby="sec-debug">
-        <h2 id="sec-debug" class="group-label">Debug</h2>
-        <ul class="group-list">
-          <li class="row">
-            <div class="row-text">
-              <span class="row-title">Show layout bounds</span>
-              <span class="row-sub"></span>
-            </div>
-            <label class="toggle">
-              <input type="checkbox" data-key="showLayoutBounds">
-              <span class="toggle-ui"></span>
-            </label>
-          </li>
-          <li class="row">
-            <div class="row-text">
-              <span class="row-title">Force dark mode</span>
-              <span class="row-sub">Override system</span>
-            </div>
-            <label class="toggle">
-              <input type="checkbox" data-key="forceDarkMode">
-              <span class="toggle-ui"></span>
-            </label>
-          </li>
-          <li class="row">
-            <div class="row-text">
-              <span class="row-title">Verbose logging</span>
-              <span class="row-sub">Local only</span>
-            </div>
-            <label class="toggle">
-              <input type="checkbox" data-key="verboseLogging">
-              <span class="toggle-ui"></span>
-            </label>
-          </li>
-        </ul>
-      </section>
+    <button type="button" id="lockPanelBtn" class="lock-panel-btn">Lock panel</button>
+  </main>
+</section>
 
-      <button type="button" id="lock-btn" class="lock-btn">Lock panel</button>
-    </main>
-  </div>
-
-  <script src="./app.js"></script>
+<script src="app.js"></script>
 </body>
 </html>

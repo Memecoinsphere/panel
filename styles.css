@@ -1,210 +1,235 @@
-/* Hidden Control Panel — iOS inset-grouped dark theme */
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
 :root {
   --bg: #000000;
-  --grouped-bg: #1c1c1e;
-  --separator: rgba(84, 84, 88, 0.65);
-  --label: #ffffff;
-  --secondary: #8e8e93;
+  --bg-elevated: #1c1c1e;
+  --bg-row: #2c2c2e;
+  --sep: rgba(84, 84, 88, 0.65);
+  --label: #8e8e93;
+  --text: #ffffff;
   --accent: #30d158;
   --danger: #ff453a;
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
-  --safe-left: env(safe-area-inset-left, 0px);
-  --safe-right: env(safe-area-inset-right, 0px);
-  --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display",
-    "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
-
-*, *::before, *::after { box-sizing: border-box; }
 
 html, body {
   margin: 0;
   padding: 0;
   height: 100%;
   background: var(--bg);
-  color: var(--label);
+  color: var(--text);
   font-family: var(--font);
-  -webkit-font-smoothing: antialiased;
   -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
   overscroll-behavior: none;
 }
 
-body {
-  min-height: 100dvh;
-  min-height: -webkit-fill-available;
-}
-
 .screen {
-  min-height: 100dvh;
-  min-height: -webkit-fill-available;
-  padding-top: var(--safe-top);
-  padding-bottom: var(--safe-bottom);
-  padding-left: var(--safe-left);
-  padding-right: var(--safe-right);
-}
-
-[hidden] { display: none !important; }
-
-/* ===== Lock screen ===== */
-#lock-screen {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  padding-left: max(24px, var(--safe-left));
-  padding-right: max(24px, var(--safe-right));
-}
-
-.lock-inner {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-  max-width: 320px;
-  margin-top: -8vh;
-}
-
-.lock-glyph {
-  margin-bottom: 20px;
-  opacity: 0.95;
-}
-
-.lock-title {
-  margin: 0 0 8px;
-  font-size: 22px;
-  font-weight: 600;
-  letter-spacing: -0.02em;
-  text-align: center;
-}
-
-.lock-hint {
-  margin: 0 0 28px;
-  font-size: 15px;
-  color: var(--secondary);
-  font-weight: 400;
-}
-
-.passcode-wrap {
-  width: 100%;
-  max-width: 220px;
-}
-
-.passcode-input {
-  width: 100%;
-  appearance: none;
-  -webkit-appearance: none;
-  background: var(--grouped-bg);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 12px;
-  color: var(--label);
-  font-size: 28px;
-  font-weight: 500;
-  letter-spacing: 0.35em;
-  text-align: center;
-  padding: 14px 16px;
-  outline: none;
-  caret-color: var(--accent);
-}
-
-.passcode-input:focus {
-  border-color: rgba(48, 209, 88, 0.55);
-  box-shadow: 0 0 0 3px rgba(48, 209, 88, 0.18);
-}
-
-.passcode-input.shake {
-  animation: shake 0.4s ease;
-}
-
-@keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  20% { transform: translateX(-8px); }
-  40% { transform: translateX(8px); }
-  60% { transform: translateX(-6px); }
-  80% { transform: translateX(6px); }
-}
-
-.passcode-error {
-  margin: 14px 0 0;
-  font-size: 13px;
-  color: var(--danger);
-  min-height: 1.2em;
-}
-
-.lock-footer {
-  position: absolute;
-  bottom: calc(28px + var(--safe-bottom));
-  left: 0;
-  right: 0;
-  text-align: center;
-  font-size: 12px;
-  color: var(--secondary);
-  letter-spacing: -0.01em;
-  padding: 0 16px;
-}
-
-/* ===== Panel ===== */
-#panel-screen {
+  position: fixed;
+  inset: 0;
   display: flex;
   flex-direction: column;
   background: var(--bg);
+  padding-top: var(--safe-top);
+  padding-bottom: var(--safe-bottom);
+}
+
+.screen[hidden] { display: none !important; }
+
+/* ----- Decoy ----- */
+#decoy {
+  align-items: center;
+  justify-content: center;
+  cursor: default;
+}
+
+.decoy-clock {
+  text-align: center;
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.decoy-time {
+  font-size: 64px;
+  font-weight: 200;
+  letter-spacing: 2px;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+}
+
+.decoy-date {
+  margin-top: 10px;
+  font-size: 17px;
+  font-weight: 400;
+  color: var(--label);
+  text-transform: capitalize;
+}
+
+/* ----- Lock / passcode ----- */
+#lock {
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.lock-inner {
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+  padding: 48px 24px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.lock-glyph {
+  width: 36px;
+  height: 36px;
+  color: var(--text);
+  opacity: 0.9;
+  margin-bottom: 16px;
+}
+
+.lock-title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.2px;
+}
+
+.lock-sub {
+  margin: 8px 0 0;
+  font-size: 15px;
+  color: var(--label);
+}
+
+.dots {
+  display: flex;
+  gap: 16px;
+  margin: 28px 0 8px;
+  min-height: 14px;
+}
+
+.dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 1.5px solid #8e8e93;
+  background: transparent;
+  transition: background 0.12s ease, border-color 0.12s ease;
+}
+
+.dot.filled {
+  background: var(--text);
+  border-color: var(--text);
+}
+
+.lock-error {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: var(--danger);
+  min-height: 18px;
+}
+
+.lock-error[hidden] { display: none; }
+
+.keypad {
+  display: grid;
+  grid-template-columns: repeat(3, 76px);
+  gap: 16px 22px;
+  margin-top: 28px;
+  justify-content: center;
+}
+
+.keypad button {
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  border: none;
+  background: #1c1c1e;
+  color: var(--text);
+  font-size: 28px;
+  font-weight: 400;
+  cursor: pointer;
+  font-family: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.keypad button:active:not(.ghost) {
+  background: #3a3a3c;
+}
+
+.keypad button.ghost {
+  background: transparent;
+  cursor: default;
+  pointer-events: none;
+}
+
+.keypad button.del {
+  background: transparent;
+  font-size: 22px;
+  color: var(--text);
+}
+
+/* ----- Panel ----- */
+#panel {
+  overflow: hidden;
 }
 
 .panel-header {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   justify-content: space-between;
   padding: 12px 20px 8px;
-  position: sticky;
-  top: 0;
-  background: rgba(0, 0, 0, 0.85);
-  backdrop-filter: saturate(180%) blur(20px);
-  -webkit-backdrop-filter: saturate(180%) blur(20px);
-  z-index: 10;
+  flex-shrink: 0;
 }
 
-.panel-title {
+.panel-header h1 {
   margin: 0;
   font-size: 28px;
   font-weight: 700;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.4px;
 }
 
-.graphene-badge {
+.badge {
   font-size: 10px;
   font-weight: 700;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.6px;
   color: var(--accent);
-  opacity: 0.9;
-  align-self: flex-start;
-  margin-top: 10px;
+  border: 1px solid rgba(48, 209, 88, 0.45);
+  border-radius: 999px;
+  padding: 4px 8px;
+  white-space: nowrap;
 }
 
-.panel-main {
+.panel-body {
   flex: 1;
-  padding: 8px 16px 40px;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
+  padding: 8px 16px 28px;
 }
 
 .group {
-  margin-bottom: 28px;
+  margin-bottom: 22px;
 }
 
-.group-label {
+.group-title {
   margin: 0 0 6px 16px;
   font-size: 13px;
   font-weight: 400;
-  color: var(--secondary);
+  color: var(--label);
   text-transform: uppercase;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.2px;
 }
 
-.group-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  background: var(--grouped-bg);
+.card {
+  background: var(--bg-elevated);
   border-radius: 12px;
   overflow: hidden;
 }
@@ -215,8 +240,9 @@ body {
   justify-content: space-between;
   gap: 12px;
   padding: 11px 16px;
-  min-height: 44px;
+  min-height: 56px;
   position: relative;
+  cursor: pointer;
 }
 
 .row + .row::before {
@@ -225,10 +251,8 @@ body {
   left: 16px;
   right: 0;
   top: 0;
-  height: 1px;
-  background: var(--separator);
-  transform: scaleY(0.5);
-  transform-origin: top;
+  height: 0.5px;
+  background: var(--sep);
 }
 
 .row-text {
@@ -236,99 +260,79 @@ body {
   flex-direction: column;
   gap: 2px;
   min-width: 0;
-  flex: 1;
 }
 
 .row-title {
   font-size: 17px;
   font-weight: 400;
-  color: var(--label);
-  line-height: 1.25;
+  color: var(--text);
 }
 
 .row-sub {
   font-size: 13px;
-  color: var(--secondary);
-  line-height: 1.2;
+  color: var(--label);
 }
 
 .row-sub:empty { display: none; }
 
-/* iOS-style toggle */
+/* iOS-style green toggle */
 .toggle {
-  position: relative;
-  display: inline-flex;
-  flex-shrink: 0;
-  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
   width: 51px;
   height: 31px;
-}
-
-.toggle input {
-  position: absolute;
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-
-.toggle-ui {
-  position: absolute;
-  inset: 0;
-  background: #39393d;
   border-radius: 31px;
+  background: #39393d;
+  position: relative;
+  flex-shrink: 0;
+  cursor: pointer;
   transition: background 0.2s ease;
+  margin: 0;
+  border: none;
+  outline: none;
 }
 
-.toggle-ui::after {
+.toggle::after {
   content: "";
   position: absolute;
   top: 2px;
   left: 2px;
   width: 27px;
   height: 27px;
-  background: #fff;
   border-radius: 50%;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.35);
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.35);
   transition: transform 0.2s ease;
 }
 
-.toggle input:checked + .toggle-ui {
+.toggle:checked {
   background: var(--accent);
 }
 
-.toggle input:checked + .toggle-ui::after {
+.toggle:checked::after {
   transform: translateX(20px);
 }
 
-.toggle input:focus-visible + .toggle-ui {
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-}
-
-.lock-btn {
+.lock-panel-btn {
   display: block;
   width: 100%;
   margin-top: 8px;
-  appearance: none;
-  -webkit-appearance: none;
-  border: none;
-  background: var(--grouped-bg);
-  color: var(--danger);
-  font-family: inherit;
-  font-size: 17px;
-  font-weight: 400;
-  text-align: center;
   padding: 14px 16px;
+  border: none;
   border-radius: 12px;
+  background: var(--bg-elevated);
+  color: var(--danger);
+  font-size: 17px;
+  font-weight: 500;
+  font-family: inherit;
   cursor: pointer;
+  text-align: center;
 }
 
-.lock-btn:active {
+.lock-panel-btn:active {
   opacity: 0.7;
 }
 
-/* Narrow phone polish */
-@media (max-width: 380px) {
-  .panel-title { font-size: 24px; }
-  .row-title { font-size: 16px; }
+@media (prefers-reduced-motion: reduce) {
+  .dot, .toggle, .toggle::after { transition: none; }
 }
